@@ -43,11 +43,11 @@ Add jitpack repo
     </repository>
 </repositories>
 ```
-Add MiniTranslator dependency
+Add MiniTranslator dependency. Current version: ![latest version](https://jitpack.io/v/imDaniX/MiniTranslator.svg)
 ```xml
 <dependency>
     <groupId>com.github.imDaniX</groupId>
     <artifactId>MiniTranslator</artifactId>
-    <version>1.0</version>
+    <version>v1.0</version>
 </dependency>
 ```
