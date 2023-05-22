@@ -30,10 +30,8 @@ List of codes and tags:
 &m <st>
 &o <i>
 &k <obf>
-
-&/X </X> (closing tags)
 ```
-## How to use
+## Get it
 Add jitpack repo
 ```xml
 <repositories>
@@ -48,6 +46,6 @@ Add MiniTranslator dependency. Current version: ![latest version](https://jitpac
 <dependency>
     <groupId>com.github.imDaniX</groupId>
     <artifactId>MiniTranslator</artifactId>
-    <version>v1.0</version>
+    <version>v2.0</version>
 </dependency>
 ```
