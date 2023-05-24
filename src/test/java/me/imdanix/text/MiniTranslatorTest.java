@@ -4,6 +4,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 
@@ -15,11 +16,19 @@ public class MiniTranslatorTest {
                 {"F&#123456oo &x&6&5&4&3&2&1ba#12345r", "F<color:#123456>oo <color:#654321>ba#12345r"},
                 {
                         "&@red-yellow-0&&lServer admin &9imDaniX &8> &#fff5d9&oHello world! YOLO",
-                        "<gradient:red:yellow:black><b>Server admin </b></gradient><blue>imDaniX <dark_gray>> <color:#fff5d9><i>Hello world! YOLO</i>"
+                        "<gradient:red:yellow:black><b>Server admin <reset><blue>imDaniX <dark_gray>> <color:#fff5d9><i>Hello world! YOLO"
                 },
                 {
                         "&a&lGreen bold, &cred normal",
-                        "<green><b>Green bold, </b><red>red normal"
+                        "<green><b>Green bold, <reset><red>red normal"
+                },
+                {
+                        "&lBold &athen green",
+                        "<b>Bold </b><green>then green"
+                },
+                {
+                        "&lJust bold",
+                        "<b>Just bold</b>"
                 }
         };
     }
@@ -29,8 +38,13 @@ public class MiniTranslatorTest {
         assertEquals(MiniTranslator.toMini(input), expected);
     }
 
+    private static final Set<MiniTranslator.Option> VERBOSE = EnumSet.allOf(MiniTranslator.Option.class);
+    static {
+        VERBOSE.remove(MiniTranslator.Option.FAST_RESET);
+    }
+
     @DataProvider
-    public Object[][] toMiniClosingData() {
+    public Object[][] toMiniVerboseData() {
         return new Object[][] {
                 {"&aA simple one", "<green>A simple one</green>"},
                 {
@@ -43,12 +57,16 @@ public class MiniTranslatorTest {
                 {
                         "&a&lGreen bold, &cred normal",
                         "<green><b>Green bold, </b></green><red>red normal</red>"
+                },
+                {
+                        "&lBold &athen green",
+                        "<b>Bold </b><green>then green</green>"
                 }
         };
     }
 
-    @Test(dataProvider = "toMiniClosingData")
-    public void toMiniClosingTest(String input, String expected) {
-        assertEquals(MiniTranslator.toMini(input, EnumSet.allOf(MiniTranslator.Option.class)), expected);
+    @Test(dataProvider = "toMiniVerboseData")
+    public void toMiniVerboseTest(String input, String expected) {
+        assertEquals(MiniTranslator.toMini(input, VERBOSE), expected);
     }
 }
