@@ -46,6 +46,6 @@ Add MiniTranslator dependency. Current version: ![latest version](https://jitpac
 <dependency>
     <groupId>com.github.imDaniX</groupId>
     <artifactId>MiniTranslator</artifactId>
-    <version>v2.0</version>
+    <version>v2.1</version>
 </dependency>
 ```
