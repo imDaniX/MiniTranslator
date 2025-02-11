@@ -46,8 +46,8 @@ public final class MiniTranslator {
             Option.COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
     ));
 
-    private static final Pattern HEX_COLOR = Pattern.compile("[\\da-f]{6}");
-    private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-f])".repeat(6));
+    private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
+    private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-fA-F])".repeat(6));
 
     private MiniTranslator() {}
 
