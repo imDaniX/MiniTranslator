@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> It's usually better to use [`LegacyComponentSerializer`](https://jd.advntr.dev/text-serializer-legacy/4.18.0/net/kyori/adventure/text/serializer/legacy/LegacyComponentSerializer.html) to deserialize `String` into `Component`, and then use `MiniMessage` to serialize the `Component` back to `String`. But if you got some unusual niche case - you're welcome here.
+
 # MiniTranslator
 A small utility to convert Minecraft's legacy formatting codes to MiniMessage tags.
 List of codes and tags:
@@ -46,6 +49,6 @@ Add MiniTranslator dependency. Current version: ![latest version](https://jitpac
 <dependency>
     <groupId>com.github.imDaniX</groupId>
     <artifactId>MiniTranslator</artifactId>
-    <version>v2.1</version>
+    <version>v2.3</version>
 </dependency>
 ```
