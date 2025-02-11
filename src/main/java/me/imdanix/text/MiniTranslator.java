@@ -1,7 +1,7 @@
 /*
     MIT License
 
-    Copyright (c) 2022 Daniil Z. (idanix@list.ru)
+    Copyright (c) 2022-2025 Daniil Z. (idanix@list.ru)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -81,8 +81,8 @@ public final class MiniTranslator {
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
         boolean fastReset = options.contains(Option.FAST_RESET);
-        boolean closeLastColor = true;
-        for (int index = 0; index < text.length(); index++) {
+        boolean closeLastTag = true;
+        for (int index = 0; index < text.length(); index++) { // TODO: Maybe refactor to jump to each '&' using indexOf
             char ch = text.charAt(index);
             if (ch != '&') {
                 builder.append(ch);
@@ -105,8 +105,8 @@ public final class MiniTranslator {
                         if (text.length() > index + 6) {
                             String color = text.substring(index + 1, index + 7);
                             if (HEX_COLOR.matcher(color).matches()) {
-                                handleClosing(order, builder, closeLastColor, fastReset);
-                                closeLastColor = defCloseValue;
+                                handleClosing(order, builder, closeLastTag, fastReset);
+                                closeLastTag = defCloseValue;
                                 String builtTag = "color:#" + color;
                                 builder.append('<').append(builtTag).append('>');
                                 index += 6;
@@ -119,8 +119,8 @@ public final class MiniTranslator {
                             String color = text.substring(index + 1, index + 13);
                             Matcher colorMatcher = LEGACY_HEX_COLOR.matcher(color);
                             if (colorMatcher.matches()) {
-                                handleClosing(order, builder, closeLastColor, fastReset);
-                                closeLastColor = defCloseValue;
+                                handleClosing(order, builder, closeLastTag, fastReset);
+                                closeLastTag = defCloseValue;
                                 String builtTag = "color:#" + colorMatcher.replaceAll("$1$2$3$4$5$6");
                                 builder.append('<').append(builtTag).append('>');
                                 index += 12;
@@ -163,8 +163,8 @@ public final class MiniTranslator {
                     }
                     if (colors.size() == split.length) {
                         index = endIndex;
-                        handleClosing(order, builder, closeLastColor, fastReset);
-                        closeLastColor = true;
+                        handleClosing(order, builder, closeLastTag, fastReset);
+                        closeLastTag = true;
                         builder.append("<gradient:").append(String.join(":", colors)).append('>');
                         order.add(tag);
                     }
@@ -178,22 +178,24 @@ public final class MiniTranslator {
                     builder.append('<').append(tag).append('>');
                 }
                 default -> {
-                    handleClosing(order, builder, closeLastColor, fastReset);
-                    closeLastColor = defCloseValue;
+                    handleClosing(order, builder, closeLastTag, fastReset);
+                    closeLastTag = defCloseValue;
                     order.add(tag);
                     builder.append('<').append(tag).append('>');
                 }
             }
         }
-        if (closeLastColor || !fastReset) handleClosing(order, builder, closeLastColor, closeLastColor && fastReset);
+        if (closeLastTag || !fastReset) {
+            handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
+        }
         return builder.toString();
     }
 
-    private static void handleClosing(List<String> order, StringBuilder builder, boolean closeFirst, boolean fastReset) {
+    private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
-        } else for (int i = order.size(), until = closeFirst ? 0 : 1; i > until; i--) {
-            builder.append("</").append(order.get(i - 1)).append('>');
+        } else for (int i = order.size() - 1, until = closeLast ? 0 : 1; i >= until; i--) {
+            builder.append("</").append(order.get(i)).append('>');
         }
         order.clear();
     }
