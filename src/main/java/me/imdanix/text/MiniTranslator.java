@@ -44,9 +44,11 @@ import java.util.regex.Pattern;
 public final class MiniTranslator {
     private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
+            Option.SHORT_COLOR,
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
+    private static final Pattern SHORT_HEX_COLOR = Pattern.compile("<#([\\da-fA-F]{6})>");
     private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-fA-F])".repeat(6));
 
     private MiniTranslator() {}
@@ -77,6 +79,10 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
+        if (options.contains(Option.SHORT_COLOR)) {
+            text = SHORT_HEX_COLOR.matcher(text).replaceAll("<color:#$1>");
+        }
+
         List<String> order = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
@@ -275,6 +281,10 @@ public final class MiniTranslator {
          * Translate color (e.g. &a &1 #123456)
          */
         COLOR,
+        /**
+         * Translate short color (e.g. <#123456>)
+         */
+        SHORT_COLOR,
         /**
          * Translate formatting (e.g. &l &r)
          */
