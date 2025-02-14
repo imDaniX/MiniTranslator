@@ -37,6 +37,9 @@ public class MiniTranslatorTest {
                         "Hello, <#ff0000>imDaniX!",
                         "Hello, <color:#ff0000>imDaniX!"
                 }, {
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
+                        "Player <color:#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active"
+                }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
                 }
@@ -77,6 +80,9 @@ public class MiniTranslatorTest {
                 }, {
                         "Hello, <#ff0000>imDaniX!",
                         "Hello, <color:#ff0000>imDaniX!"
+                }, {
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
+                        "Player <color:#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active</color:#fff5d9>"
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
