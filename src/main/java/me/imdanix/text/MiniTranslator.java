@@ -44,7 +44,6 @@ import java.util.regex.Pattern;
 public final class MiniTranslator {
     private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
-            Option.SHORT_COLOR,
             Option.HEX_COLOR_STANDALONE,
             Option.FORMAT,
             Option.GRADIENT,
@@ -52,8 +51,7 @@ public final class MiniTranslator {
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
-    private static final Pattern HEX_COLOR_STANDALONE = Pattern.compile("(?<![<:&])#([\\da-fA-F]{6})(?!>)");
-    private static final Pattern SHORT_HEX_COLOR = Pattern.compile("<#([\\da-fA-F]{6})>");
+    private static final Pattern HEX_COLOR_STANDALONE = Pattern.compile("(?<![<:&])#([\\da-fA-F]{6})(?![^<]*>)");
     private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-fA-F])".repeat(6));
 
     private MiniTranslator() {}
@@ -84,10 +82,6 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
-        if (options.contains(Option.SHORT_COLOR)) {
-            text = SHORT_HEX_COLOR.matcher(text).replaceAll("<color:#$1>");
-        }
-
         if (options.contains(Option.HEX_COLOR_STANDALONE)) {
             text = HEX_COLOR_STANDALONE.matcher(text).replaceAll("<color:#$1>");
         }
@@ -294,10 +288,6 @@ public final class MiniTranslator {
          * Translate standalone hex colors (e.g. #123456)
          */
         HEX_COLOR_STANDALONE,
-        /**
-         * Translate short color (e.g. <#123456>)
-         */
-        SHORT_COLOR,
         /**
          * Translate formatting (e.g. &l &r)
          */

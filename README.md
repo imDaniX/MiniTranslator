@@ -25,7 +25,6 @@ List of codes and tags:
 &x&1&2&3&4&5&6 <color:#123456>
 &#123456 <color:#123456>
 #123456 <color:#123456>
-<#123456> <color:#123456>
 
 &@#abcdef-red-a& <gradient:#abcdef:red:green>
 
