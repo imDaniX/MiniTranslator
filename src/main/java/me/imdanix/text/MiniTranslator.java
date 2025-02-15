@@ -310,7 +310,7 @@ public final class MiniTranslator {
          */
         COLOR,
         /**
-         * Translate formatting (e.g. <##123456>)
+         * Translate double hash color (e.g. <##123456>)
          */
         DOUBLE_HASH_COLOR,
         /**
