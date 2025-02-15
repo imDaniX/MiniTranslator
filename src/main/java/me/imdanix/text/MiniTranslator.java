@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  */
 public final class MiniTranslator {
     private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
-            Option.COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
+            Option.COLOR, Option.DOUBLE_HASH_COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
@@ -77,6 +77,11 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
+
+        if (options.contains(Option.DOUBLE_HASH_COLOR)) {
+            text = replaceDoubleHashHexColor(text);
+        }
+
         List<String> order = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
@@ -191,6 +196,35 @@ public final class MiniTranslator {
         return builder.toString();
     }
 
+    private static String replaceDoubleHashHexColor(String text) {
+        StringBuilder result = new StringBuilder();
+        int index = 0;
+
+        while (index < text.length()) {
+            int nextIndex = text.indexOf("<##", index);
+            if (nextIndex == -1) {
+                result.append(text.substring(index));
+                break;
+            }
+
+            result.append(text, index, nextIndex);
+
+            if (nextIndex + 9 <= text.length() && text.charAt(nextIndex + 9) == '>') {
+                String hexColor = text.substring(nextIndex + 3, nextIndex + 9);
+                result.append(HEX_COLOR.matcher(hexColor).matches() ? "<#" : "<##")
+                        .append(hexColor)
+                        .append(">");
+
+                index = nextIndex + 10;
+            } else {
+                result.append("<##");
+                index = nextIndex + 3;
+            }
+        }
+
+        return result.toString();
+    }
+
     private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
@@ -275,6 +309,10 @@ public final class MiniTranslator {
          * Translate color (e.g. &a &1 #123456)
          */
         COLOR,
+        /**
+         * Translate formatting (e.g. <##123456>)
+         */
+        DOUBLE_HASH_COLOR,
         /**
          * Translate formatting (e.g. &l &r)
          */

@@ -36,6 +36,9 @@ public class MiniTranslatorTest {
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
+                }, {
+                        "<##084CFB>Double <#7CC1FC>text",
+                        "<#084CFB>Double <#7CC1FC>text"
                 }
         };
     }
@@ -74,6 +77,9 @@ public class MiniTranslatorTest {
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
+                }, {
+                        "<##084CFB>Double <#7CC1FC>text",
+                        "<#084CFB>Double <#7CC1FC>text"
                 }
         };
     }
