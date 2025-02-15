@@ -51,7 +51,6 @@ public final class MiniTranslator {
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
-    private static final Pattern HEX_COLOR_STANDALONE = Pattern.compile("(?<![<:&])#([\\da-fA-F]{6})(?![^<]*>)");
     private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-fA-F])".repeat(6));
 
     private MiniTranslator() {}
@@ -83,7 +82,7 @@ public final class MiniTranslator {
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
         if (options.contains(Option.HEX_COLOR_STANDALONE)) {
-            text = HEX_COLOR_STANDALONE.matcher(text).replaceAll("<color:#$1>");
+            text = replaceHexColorStandalone(text);
         }
 
         List<String> order = new ArrayList<>();
@@ -198,6 +197,41 @@ public final class MiniTranslator {
             handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
         }
         return builder.toString();
+    }
+
+    private static String replaceHexColorStandalone(String text) {
+        StringBuilder result = new StringBuilder();
+        int index = 0;
+
+        while (index < text.length()) {
+            int nextIndex = text.indexOf('#', index);
+            if (nextIndex == -1) {
+                result.append(text, index, text.length());
+                break;
+            }
+
+            if (isHexColorStandalone(text, nextIndex)) {
+                result.append(text, index, nextIndex).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
+                index = nextIndex + 7;
+            } else {
+                result.append(text, index, nextIndex + 1);
+                index = nextIndex + 1;
+            }
+        }
+
+        return result.toString();
+    }
+
+    private static boolean isHexColorStandalone(String text, int index) {
+        if (index > 0 && "<:&".indexOf(text.charAt(index - 1)) != -1) {
+            return false;
+        }
+
+        if (index + 7 > text.length() || !HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches()) {
+            return false;
+        }
+
+        return index + 7 == text.length() || text.charAt(index + 7) == '>' || "<:".indexOf(text.charAt(index + 7)) == -1;
     }
 
     private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
