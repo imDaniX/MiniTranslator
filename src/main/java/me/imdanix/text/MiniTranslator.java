@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  */
 public final class MiniTranslator {
     private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
-            Option.COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
+            Option.COLOR, Option.HEX_COLOR_STANDALONE, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
@@ -77,6 +77,10 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
+        if (options.contains(Option.HEX_COLOR_STANDALONE)) {
+            text = replaceHexColorStandalone(text);
+        }
+
         List<String> order = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
@@ -191,6 +195,41 @@ public final class MiniTranslator {
         return builder.toString();
     }
 
+    private static String replaceHexColorStandalone(String text) {
+        StringBuilder result = new StringBuilder();
+        int index = 0;
+
+        while (index < text.length()) {
+            int nextIndex = text.indexOf('#', index);
+            if (nextIndex == -1) {
+                result.append(text, index, text.length());
+                break;
+            }
+
+            if (isHexColorStandalone(text, nextIndex)) {
+                result.append(text, index, nextIndex).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
+                index = nextIndex + 7;
+            } else {
+                result.append(text, index, nextIndex + 1);
+                index = nextIndex + 1;
+            }
+        }
+
+        return result.toString();
+    }
+
+    private static boolean isHexColorStandalone(String text, int index) {
+        if (index > 0 && "<:&".indexOf(text.charAt(index - 1)) != -1) {
+            return false;
+        }
+
+        if (index + 7 > text.length() || !HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches()) {
+            return false;
+        }
+
+        return index + 7 == text.length() || text.charAt(index + 7) == '>' || "<:".indexOf(text.charAt(index + 7)) == -1;
+    }
+
     private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
@@ -275,6 +314,10 @@ public final class MiniTranslator {
          * Translate color (e.g. &a &1 #123456)
          */
         COLOR,
+        /**
+         * Translate standalone hex colors (e.g. #123456)
+         */
+        HEX_COLOR_STANDALONE,
         /**
          * Translate formatting (e.g. &l &r)
          */

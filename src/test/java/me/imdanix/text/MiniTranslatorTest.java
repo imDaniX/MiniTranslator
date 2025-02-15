@@ -31,6 +31,9 @@ public class MiniTranslatorTest {
                         "&lJust bold",
                         "<b>Just bold</b>"
                 }, {
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active"
+                }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF <red><b>CAPS LOCK<reset><color:#123ABC>?!",
                 }, {
@@ -68,6 +71,9 @@ public class MiniTranslatorTest {
                 }, {
                         "&lBold &athen green",
                         "<b>Bold </b><green>then green</green>"
+                }, {
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active</color:#fff5d9>"
                 }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF </white><red><b>CAPS LOCK</b></red><color:#123ABC>?!</color:#123ABC>",
