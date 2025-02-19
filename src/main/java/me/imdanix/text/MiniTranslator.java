@@ -82,26 +82,35 @@ public final class MiniTranslator {
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
         boolean fastReset = options.contains(Option.FAST_RESET);
         boolean closeLastTag = true;
-        for (int index = 0; index < text.length(); index++) { // TODO: Maybe refactor to jump to each '&' using indexOf
-            char ch = text.charAt(index);
-            if (ch != '&') {
-                builder.append(ch);
-                continue;
+
+        for (
+                int index = 0, nextIndex = text.indexOf('&');
+                index < text.length();
+                index++, nextIndex = text.indexOf('&', index)
+        ) {
+            if (nextIndex == -1) {
+                builder.append(text.substring(index));
+                break;
             }
 
-            if (text.length() == ++index) {
+            builder.append(text, index, nextIndex);
+            index = nextIndex + 1;
+
+            if (index >= text.length()) {
                 builder.append('&');
                 break;
             }
-            ch = text.charAt(index);
-            String tag = tagByChar(ch, options);
+
+            char symbol = text.charAt(index);
+            String tag = tagByChar(symbol, options);
             if (tag == null) {
-                builder.append('&').append(ch);
+                builder.append('&').append(symbol);
                 continue;
             }
+
             switch (tag) {
                 case "color" -> {
-                    if (ch == '#') {
+                    if (symbol == '#') {
                         if (text.length() > index + 6) {
                             String color = text.substring(index + 1, index + 7);
                             if (HEX_COLOR.matcher(color).matches()) {
@@ -114,22 +123,20 @@ public final class MiniTranslator {
                                 continue;
                             }
                         }
-                    } else {
-                        if (text.length() > index + 12) {
-                            String color = text.substring(index + 1, index + 13);
-                            Matcher colorMatcher = LEGACY_HEX_COLOR.matcher(color);
-                            if (colorMatcher.matches()) {
-                                handleClosing(order, builder, closeLastTag, fastReset);
-                                closeLastTag = defCloseValue;
-                                String builtTag = "color:#" + colorMatcher.replaceAll("$1$2$3$4$5$6");
-                                builder.append('<').append(builtTag).append('>');
-                                index += 12;
-                                order.add(builtTag);
-                                continue;
-                            }
+                    } else if (text.length() > index + 12) {
+                        String color = text.substring(index + 1, index + 13);
+                        Matcher colorMatcher = LEGACY_HEX_COLOR.matcher(color);
+                        if (colorMatcher.matches()) {
+                            handleClosing(order, builder, closeLastTag, fastReset);
+                            closeLastTag = defCloseValue;
+                            String builtTag = "color:#" + colorMatcher.replaceAll("$1$2$3$4$5$6");
+                            builder.append('<').append(builtTag).append('>');
+                            index += 12;
+                            order.add(builtTag);
+                            continue;
                         }
                     }
-                    builder.append('&').append(ch);
+                    builder.append('&').append(symbol);
                 }
                 case "gradient" -> {
                     int endIndex = -1;
