@@ -83,9 +83,11 @@ public final class MiniTranslator {
         boolean fastReset = options.contains(Option.FAST_RESET);
         boolean closeLastTag = true;
 
-        int index = 0;
-        while (index < text.length()) {
-            int nextIndex = text.indexOf('&', index);
+        for (
+                int index = 0, nextIndex = text.indexOf('&');
+                index < text.length();
+                index++, nextIndex = text.indexOf('&', index)
+        ) {
             if (nextIndex == -1) {
                 builder.append(text.substring(index));
                 break;
@@ -103,7 +105,6 @@ public final class MiniTranslator {
             String tag = tagByChar(symbol, options);
             if (tag == null) {
                 builder.append('&').append(symbol);
-                index++;
                 continue;
             }
 
@@ -117,7 +118,7 @@ public final class MiniTranslator {
                                 closeLastTag = defCloseValue;
                                 String builtTag = "color:#" + color;
                                 builder.append('<').append(builtTag).append('>');
-                                index += 7;
+                                index += 6;
                                 order.add(builtTag);
                                 continue;
                             }
@@ -130,7 +131,7 @@ public final class MiniTranslator {
                             closeLastTag = defCloseValue;
                             String builtTag = "color:#" + colorMatcher.replaceAll("$1$2$3$4$5$6");
                             builder.append('<').append(builtTag).append('>');
-                            index += 13;
+                            index += 12;
                             order.add(builtTag);
                             continue;
                         }
@@ -151,7 +152,6 @@ public final class MiniTranslator {
                     String[] split;
                     if (endIndex == -1 || (split = text.substring(index + 1, endIndex).split("-")).length == 1) {
                         builder.append("&@");
-                        index++;
                         continue;
                     }
                     List<String> colors = new ArrayList<>(split.length);
@@ -191,7 +191,6 @@ public final class MiniTranslator {
                     builder.append('<').append(tag).append('>');
                 }
             }
-            index++;
         }
         if (closeLastTag || !fastReset) {
             handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
