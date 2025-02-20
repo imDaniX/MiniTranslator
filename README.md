@@ -36,7 +36,7 @@ Here’s how legacy codes map to MiniMessage tags:
 | `&k`               | `<obf>`                        |
 
 ## Get It
-Current version: ![latest version](https://jitpack.io/v/imDaniX/MiniTranslator.svg)
+Current version: [![latest version](https://jitpack.io/v/imDaniX/MiniTranslator.svg)](https://jitpack.io/#imDaniX/MiniTranslator)
 
 ### Maven
 1. Add the JitPack repository to your `pom.xml`:
