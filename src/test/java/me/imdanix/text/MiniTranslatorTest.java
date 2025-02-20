@@ -28,7 +28,7 @@ public class MiniTranslatorTest {
                         "&lBold &athen green",
                         "<b>Bold </b><green>then green"
                 }, {
-                        "&lJust bold",
+                        "§lJust bold",
                         "<b>Just bold</b>"
                 }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
@@ -68,6 +68,9 @@ public class MiniTranslatorTest {
                 }, {
                         "&lBold &athen green",
                         "<b>Bold </b><green>then green</green>"
+                }, {
+                        "§lJust bold",
+                        "<b>Just bold</b>"
                 }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF </white><red><b>CAPS LOCK</b></red><color:#123ABC>?!</color:#123ABC>",
