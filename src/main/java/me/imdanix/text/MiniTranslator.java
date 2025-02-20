@@ -77,8 +77,7 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
-
-        text = text.replace("§", "&");
+        text = text.replace('§', '&');
 
         List<String> order = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
