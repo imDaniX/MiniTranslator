@@ -37,6 +37,9 @@ public class MiniTranslatorTest {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF <red><b>CAPS LOCK<reset><color:#123ABC>?!",
                 }, {
+                        "<color:#123456>Replace <color:#123456this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? #123456>!!",
+                        "<color:#123456>Replace <color:<color:#123456>this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? <color:#123456>>!!",
+                }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
                 }
@@ -77,6 +80,9 @@ public class MiniTranslatorTest {
                 }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF </white><red><b>CAPS LOCK</b></red><color:#123ABC>?!</color:#123ABC>",
+                }, {
+                        "<color:#123456>Replace <color:#123456this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? #123456>!!",
+                        "<color:#123456>Replace <color:<color:#123456>this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? <color:#123456>>!!",
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
