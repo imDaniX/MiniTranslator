@@ -78,6 +78,7 @@ public final class MiniTranslator {
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
         text = text.replace('§', '&');
+        final String colorTagStart = options.contains(Option.VERBOSE_HEX_COLOR) ? "color:#" : "#";
 
         List<String> order = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
@@ -86,8 +87,8 @@ public final class MiniTranslator {
         boolean closeLastTag = defCloseValue;
 
         for (
-                int index = 0, nextIndex = text.indexOf('&');
-                index < text.length();
+                int index = 0, nextIndex = text.indexOf('&'), length = text.length();
+                index < length;
                 index++, nextIndex = text.indexOf('&', index)
         ) {
             if (nextIndex == -1) {
@@ -98,7 +99,7 @@ public final class MiniTranslator {
             builder.append(text, index, nextIndex);
             index = nextIndex + 1;
 
-            if (index >= text.length()) {
+            if (index >= length) {
                 builder.append('&');
                 break;
             }
@@ -111,27 +112,28 @@ public final class MiniTranslator {
             }
 
             switch (tag) {
-                case "color" -> {
+                case "hex_color" -> {
+                    // TODO: This looks too duplicated - there has to be a good way to simplify it
                     if (symbol == '#') {
-                        if (text.length() > index + 6) {
+                        if (length > index + 6) {
                             String color = text.substring(index + 1, index + 7);
                             if (HEX_COLOR.matcher(color).matches()) {
                                 handleClosing(order, builder, closeLastTag, fastReset);
                                 closeLastTag = defCloseValue;
-                                String builtTag = "color:#" + color;
+                                String builtTag = colorTagStart + color;
                                 builder.append('<').append(builtTag).append('>');
                                 index += 6;
                                 order.add(builtTag);
                                 continue;
                             }
                         }
-                    } else if (text.length() > index + 12) {
+                    } else if (length > index + 12) {
                         String color = text.substring(index + 1, index + 13);
                         Matcher colorMatcher = LEGACY_HEX_COLOR.matcher(color);
                         if (colorMatcher.matches()) {
                             handleClosing(order, builder, closeLastTag, fastReset);
                             closeLastTag = defCloseValue;
-                            String builtTag = "color:#" + colorMatcher.replaceAll("$1$2$3$4$5$6");
+                            String builtTag = colorTagStart + colorMatcher.replaceAll("$1$2$3$4$5$6");
                             builder.append('<').append(builtTag).append('>');
                             index += 12;
                             order.add(builtTag);
@@ -142,7 +144,7 @@ public final class MiniTranslator {
                 }
                 case "gradient" -> {
                     int endIndex = -1;
-                    for (int inner = index + 1; inner < text.length(); inner++) {
+                    for (int inner = index + 1; inner < length; inner++) {
                         char inCh = Character.toLowerCase(text.charAt(inner));
                         if (inCh == '&') {
                             endIndex = inner;
@@ -213,7 +215,7 @@ public final class MiniTranslator {
         if (isColorChar(ch)) {
             if (!options.contains(Option.COLOR)) return null;
             return switch (ch) {
-                case 'x', 'X', '#' -> "color";
+                case 'x', 'X', '#' -> "hex_color";
                 default -> colorByChar(ch);
             };
         } else if (isFormatChar(ch)) {
@@ -281,15 +283,19 @@ public final class MiniTranslator {
      */
     public enum Option {
         /**
-         * Translate color (e.g. &a &1 #123456)
+         * Translate color (e.g. {@code &a} {@code &1} {@code &#123456})
          */
         COLOR,
         /**
-         * Translate formatting (e.g. &l &r)
+         * Translate formatting (e.g. {@code &l} {@code &r})
          */
         FORMAT,
         /**
-         * Translate custom gradient format (e.g. &@gold-#123456&)
+         * Use the full MiniMessage color format {@code <color:#123456>} instead of the shortened one {@code <#123456>}
+         */
+        VERBOSE_HEX_COLOR,
+        /**
+         * Translate custom gradient format (e.g. {@code &@gold-#123456&})
          */
         GRADIENT,
         /**
