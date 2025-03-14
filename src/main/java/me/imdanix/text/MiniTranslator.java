@@ -42,7 +42,11 @@ import java.util.regex.Pattern;
  * A "translator" from legacy minecraft formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
  */
 public final class MiniTranslator {
-    private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
+    /**
+     * The default options used in {@link MiniTranslator#toMini(String)}.
+     * The content might change in the future.
+     */
+    public static final Set<Option> DEFAULT_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR, Option.FORMAT, Option.RESET, Option.GRADIENT, Option.FAST_RESET
     ));
 
@@ -52,12 +56,13 @@ public final class MiniTranslator {
     private MiniTranslator() {}
 
     /**
-     * Translate text to MiniMessage format with default options (everything but {@link Option#CLOSE_COLORS})
+     * Translate text to MiniMessage format using default options
      * @param text text to translate
      * @return translated string
+     * @see MiniTranslator#DEFAULT_OPTIONS
      */
     public static @NotNull String toMini(@NotNull String text) {
-        return toMini(text, DEF_OPTIONS);
+        return toMini(text, DEFAULT_OPTIONS);
     }
 
     /**
