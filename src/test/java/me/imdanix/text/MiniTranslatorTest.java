@@ -31,14 +31,8 @@ public class MiniTranslatorTest {
                         "&lJust bold",
                         "<b>Just bold</b>"
                 }, {
-                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
-                        "Player <#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active"
-                }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF <red><b>CAPS LOCK<reset><color:#123ABC>?!",
-                }, {
-                        "<color:#123456>Replace <color:#123456this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? #123456>!!",
-                        "<color:#123456>Replace <color:<color:#123456>this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? <color:#123456>>!!",
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
@@ -49,6 +43,29 @@ public class MiniTranslatorTest {
     @Test(dataProvider = "toMiniData")
     public void toMiniTest(String input, String expected) {
         assertEquals(MiniTranslator.toMini(input), expected);
+    }
+
+    @DataProvider
+    public Object[][] toMiniStandaloneData() {
+        return new Object[][] {
+                {
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active"
+                }, {
+                        "<color:#123456>Replace <color:#123456this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? #123456>!!",
+                        "<color:#123456>Replace <color:<color:#123456>this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? <color:#123456>>!!",
+                }
+        };
+    }
+
+    private static final Set<MiniTranslator.Option> STANDALONE = EnumSet.allOf(MiniTranslator.Option.class);
+    static {
+        STANDALONE.remove(MiniTranslator.Option.CLOSE_COLORS);
+    }
+
+    @Test(dataProvider = "toMiniStandaloneData")
+    public void toMiniStandaloneTest(String input, String expected) {
+        assertEquals(MiniTranslator.toMini(input, STANDALONE), expected);
     }
 
     private static final Set<MiniTranslator.Option> VERBOSE = EnumSet.allOf(MiniTranslator.Option.class);

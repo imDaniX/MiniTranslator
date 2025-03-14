@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  */
 public final class MiniTranslator {
     private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
-            Option.COLOR, Option.HEX_COLOR_STANDALONE, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
+            Option.COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
