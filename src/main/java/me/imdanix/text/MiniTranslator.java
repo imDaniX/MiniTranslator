@@ -83,6 +83,11 @@ public final class MiniTranslator {
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
         text = text.replace('§', '&');
+      
+        if (options.contains(Option.HEX_COLOR_STANDALONE)) {
+            text = replaceHexColorStandalone(text);
+        }
+      
         final String colorTagStart = options.contains(Option.VERBOSE_HEX_COLOR) ? "color:#" : "#";
 
         List<String> order = new ArrayList<>();
@@ -207,6 +212,50 @@ public final class MiniTranslator {
         return builder.toString();
     }
 
+    private static String replaceHexColorStandalone(String text) {
+        StringBuilder result = new StringBuilder();
+        int index = 0;
+
+        while (index < text.length()) {
+            int nextIndex = text.indexOf('#', index);
+            if (nextIndex == -1) {
+                result.append(text, index, text.length());
+                break;
+            }
+
+            if (isHexColorStandalone(text, nextIndex)) {
+                result.append(text, index, nextIndex).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
+                index = nextIndex + 7;
+            } else {
+                result.append(text, index, nextIndex + 1);
+                index = nextIndex + 1;
+            }
+        }
+
+        return result.toString();
+    }
+
+    private static boolean isHexColorStandalone(String text, int index) {
+        if (index > 0 && text.charAt(index - 1) == '&') {
+            return false;
+        }
+
+
+        if (index > 0 && text.charAt(index - 1) == '<') {
+            if (index + 7 < text.length() && text.charAt(index + 7) == '>') {
+                return false;
+            }
+        }
+
+        if (index > 0 && text.charAt(index - 1) == ':') {
+            if (index + 7 < text.length() && ">:".indexOf(text.charAt(index + 7)) != -1) {
+                return false;
+            }
+        }
+
+        return index + 7 <= text.length() && HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
+    }
+
     private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
@@ -292,6 +341,11 @@ public final class MiniTranslator {
          */
         COLOR,
         /**
+         * Translate standalone hex colors (e.g. #123456)
+         */
+        HEX_COLOR_STANDALONE,
+        /**
+         * Translate formatting (e.g. &l &r)
          * Translate formatting (e.g. {@code &l} {@code &o})
          */
         FORMAT,
