@@ -37,6 +37,9 @@ public class MiniTranslatorTest {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
                 }, {
+                        "<##084CFB>Double <#7CC1FC>text",
+                        "<#084CFB>Double <#7CC1FC>text"
+                }, {
                         "&a&lStart from the&r scratch",
                         "<green><b>Start from the<reset> scratch"
                 }
@@ -80,6 +83,9 @@ public class MiniTranslatorTest {
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
+                }, {
+                        "<##084CFB>Double <#7CC1FC>text",
+                        "<#084CFB>Double <#7CC1FC>text"
                 }, {
                         "&a&lStart from the&r scratch",
                         "<green><b>Start from the<reset> scratch"
