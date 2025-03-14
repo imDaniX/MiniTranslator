@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  */
 public final class MiniTranslator {
     private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
-            Option.COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
+            Option.COLOR, Option.FORMAT, Option.RESET, Option.GRADIENT, Option.FAST_RESET
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
@@ -221,15 +221,16 @@ public final class MiniTranslator {
         } else if (isFormatChar(ch)) {
             if (!options.contains(Option.FORMAT)) return null;
             return switch (ch) {
-                case 'r', 'R' -> "reset";
                 case 'l', 'L' -> "b";
                 case 'n', 'N' -> "u";
                 case 'm', 'M' -> "st";
                 case 'o', 'O' -> "i";
                 case 'k', 'K' -> "obf";
-
-                default -> null;
+                default -> throw new IllegalStateException("Provided impossible symbol '" + ch + "'");
             };
+        } else if (ch == 'r' || ch == 'R') {
+            if (!options.contains(Option.RESET)) return null;
+            return "reset";
         } else if (ch == '@' && options.contains(Option.GRADIENT)) {
             return "gradient";
         }
@@ -272,8 +273,7 @@ public final class MiniTranslator {
     private static boolean isFormatChar(char ch) {
         return switch (ch) {
             case 'k', 'l', 'm', 'n', 'o',
-                 'K', 'L', 'M', 'N', 'O',
-                 'r', 'R' -> true;
+                 'K', 'L', 'M', 'N', 'O' -> true;
             default -> false;
         };
     }
@@ -287,9 +287,13 @@ public final class MiniTranslator {
          */
         COLOR,
         /**
-         * Translate formatting (e.g. {@code &l} {@code &r})
+         * Translate formatting (e.g. {@code &l} {@code &o})
          */
         FORMAT,
+        /**
+         * Translate the reset tag {@code &r}
+         */
+        RESET,
         /**
          * Use the full MiniMessage color format {@code <color:#123456>} instead of the shortened one {@code <#123456>}
          */
