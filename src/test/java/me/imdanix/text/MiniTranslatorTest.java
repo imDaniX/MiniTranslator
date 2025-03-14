@@ -17,28 +17,31 @@ public class MiniTranslatorTest {
                         "<green>A simple one"
                 }, {
                         "F&#123456oo &x&6&5&4&3&2&1ba#12345r",
-                        "F<color:#123456>oo <color:#654321>ba#12345r"
+                        "F<#123456>oo <#654321>ba#12345r"
                 }, {
                         "&@red-yellow-0&&lServer admin &9imDaniX &8> &#fff5d9&oHello world! YOLO",
-                        "<gradient:red:yellow:black><b>Server admin <reset><blue>imDaniX <dark_gray>> <color:#fff5d9><i>Hello world! YOLO"
+                        "<gradient:red:yellow:black><b>Server admin <reset><blue>imDaniX <dark_gray>> <#fff5d9><i>Hello world! YOLO"
                 }, {
                         "&a&lGreen bold, &cred normal",
                         "<green><b>Green bold, <reset><red>red normal"
                 }, {
                         "&lBold &athen green",
-                        "<b>Bold </b><green>then green"
+                        "<b>Bold <green>then green"
                 }, {
-                        "&lJust bold",
-                        "<b>Just bold</b>"
+                        "§lJust bold",
+                        "<b>Just bold"
                 }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
-                        "<white>HOW TO TURN OFF <red><b>CAPS LOCK<reset><color:#123ABC>?!",
+                        "<white>HOW TO TURN OFF <red><b>CAPS LOCK<reset><#123ABC>?!",
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
                 }, {
                         "<##084CFB>Double <#7CC1FC>text",
                         "<#084CFB>Double <#7CC1FC>text"
+                }, {
+                        "&a&lStart from the&r scratch",
+                        "<green><b>Start from the<reset> scratch"
                 }
         };
     }
@@ -72,6 +75,9 @@ public class MiniTranslatorTest {
                         "&lBold &athen green",
                         "<b>Bold </b><green>then green</green>"
                 }, {
+                        "§lJust bold",
+                        "<b>Just bold</b>"
+                }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF </white><red><b>CAPS LOCK</b></red><color:#123ABC>?!</color:#123ABC>",
                 }, {
@@ -80,6 +86,9 @@ public class MiniTranslatorTest {
                 }, {
                         "<##084CFB>Double <#7CC1FC>text",
                         "<#084CFB>Double <#7CC1FC>text"
+                }, {
+                        "&a&lStart from the&r scratch",
+                        "<green><b>Start from the<reset> scratch"
                 }
         };
     }

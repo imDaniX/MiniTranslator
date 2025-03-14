@@ -42,8 +42,12 @@ import java.util.regex.Pattern;
  * A "translator" from legacy minecraft formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
  */
 public final class MiniTranslator {
-    private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
-            Option.COLOR, Option.DOUBLE_HASH_COLOR, Option.FORMAT, Option.GRADIENT, Option.FAST_RESET
+    /**
+     * The default options used in {@link MiniTranslator#toMini(String)}.
+     * The content might change in the future.
+     */
+    public static final Set<Option> DEFAULT_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
+            Option.COLOR, Option.DOUBLE_HASH_COLOR, Option.FORMAT, Option.RESET, Option.GRADIENT, Option.FAST_RESET
     ));
 
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
@@ -52,12 +56,13 @@ public final class MiniTranslator {
     private MiniTranslator() {}
 
     /**
-     * Translate text to MiniMessage format with default options (everything but {@link Option#CLOSE_COLORS})
+     * Translate text to MiniMessage format using default options
      * @param text text to translate
      * @return translated string
+     * @see MiniTranslator#DEFAULT_OPTIONS
      */
     public static @NotNull String toMini(@NotNull String text) {
-        return toMini(text, DEF_OPTIONS);
+        return toMini(text, DEFAULT_OPTIONS);
     }
 
     /**
@@ -77,68 +82,79 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
+        text = text.replace('§', '&');
 
         if (options.contains(Option.DOUBLE_HASH_COLOR)) {
             text = replaceDoubleHashHexColor(text);
         }
+        
+        final String colorTagStart = options.contains(Option.VERBOSE_HEX_COLOR) ? "color:#" : "#";
 
         List<String> order = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
         boolean fastReset = options.contains(Option.FAST_RESET);
-        boolean closeLastTag = true;
-        for (int index = 0; index < text.length(); index++) { // TODO: Maybe refactor to jump to each '&' using indexOf
-            char ch = text.charAt(index);
-            if (ch != '&') {
-                builder.append(ch);
-                continue;
+        boolean closeLastTag = defCloseValue;
+
+        for (
+                int index = 0, nextIndex = text.indexOf('&'), length = text.length();
+                index < length;
+                index++, nextIndex = text.indexOf('&', index)
+        ) {
+            if (nextIndex == -1) {
+                builder.append(text.substring(index));
+                break;
             }
 
-            if (text.length() == ++index) {
+            builder.append(text, index, nextIndex);
+            index = nextIndex + 1;
+
+            if (index >= length) {
                 builder.append('&');
                 break;
             }
-            ch = text.charAt(index);
-            String tag = tagByChar(ch, options);
+
+            char symbol = text.charAt(index);
+            String tag = tagByChar(symbol, options);
             if (tag == null) {
-                builder.append('&').append(ch);
+                builder.append('&').append(symbol);
                 continue;
             }
+
             switch (tag) {
-                case "color" -> {
-                    if (ch == '#') {
-                        if (text.length() > index + 6) {
+                case "hex_color" -> {
+                    // TODO: This looks too duplicated - there has to be a good way to simplify it
+                    if (symbol == '#') {
+                        if (length > index + 6) {
                             String color = text.substring(index + 1, index + 7);
                             if (HEX_COLOR.matcher(color).matches()) {
                                 handleClosing(order, builder, closeLastTag, fastReset);
                                 closeLastTag = defCloseValue;
-                                String builtTag = "color:#" + color;
+                                String builtTag = colorTagStart + color;
                                 builder.append('<').append(builtTag).append('>');
                                 index += 6;
                                 order.add(builtTag);
                                 continue;
                             }
                         }
-                    } else {
-                        if (text.length() > index + 12) {
-                            String color = text.substring(index + 1, index + 13);
-                            Matcher colorMatcher = LEGACY_HEX_COLOR.matcher(color);
-                            if (colorMatcher.matches()) {
-                                handleClosing(order, builder, closeLastTag, fastReset);
-                                closeLastTag = defCloseValue;
-                                String builtTag = "color:#" + colorMatcher.replaceAll("$1$2$3$4$5$6");
-                                builder.append('<').append(builtTag).append('>');
-                                index += 12;
-                                order.add(builtTag);
-                                continue;
-                            }
+                    } else if (length > index + 12) {
+                        String color = text.substring(index + 1, index + 13);
+                        Matcher colorMatcher = LEGACY_HEX_COLOR.matcher(color);
+                        if (colorMatcher.matches()) {
+                            handleClosing(order, builder, closeLastTag, fastReset);
+                            closeLastTag = defCloseValue;
+                            String builtTag = colorTagStart + colorMatcher.replaceAll("$1$2$3$4$5$6");
+                            builder.append('<').append(builtTag).append('>');
+                            index += 12;
+                            order.add(builtTag);
+                            continue;
                         }
                     }
-                    builder.append('&').append(ch);
+                    builder.append('&').append(symbol);
                 }
                 case "gradient" -> {
                     int endIndex = -1;
-                    for (int inner = index + 1; inner < text.length(); inner++) {
+                    for (int inner = index + 1; inner < length; inner++) {
                         char inCh = Character.toLowerCase(text.charAt(inner));
                         if (inCh == '&') {
                             endIndex = inner;
@@ -238,21 +254,22 @@ public final class MiniTranslator {
         if (isColorChar(ch)) {
             if (!options.contains(Option.COLOR)) return null;
             return switch (ch) {
-                case 'x', 'X', '#' -> "color";
+                case 'x', 'X', '#' -> "hex_color";
                 default -> colorByChar(ch);
             };
         } else if (isFormatChar(ch)) {
             if (!options.contains(Option.FORMAT)) return null;
             return switch (ch) {
-                case 'r', 'R' -> "reset";
                 case 'l', 'L' -> "b";
                 case 'n', 'N' -> "u";
                 case 'm', 'M' -> "st";
                 case 'o', 'O' -> "i";
                 case 'k', 'K' -> "obf";
-
-                default -> null;
+                default -> throw new IllegalStateException("Provided impossible symbol '" + ch + "'");
             };
+        } else if (ch == 'r' || ch == 'R') {
+            if (!options.contains(Option.RESET)) return null;
+            return "reset";
         } else if (ch == '@' && options.contains(Option.GRADIENT)) {
             return "gradient";
         }
@@ -295,8 +312,7 @@ public final class MiniTranslator {
     private static boolean isFormatChar(char ch) {
         return switch (ch) {
             case 'k', 'l', 'm', 'n', 'o',
-                 'K', 'L', 'M', 'N', 'O',
-                 'r', 'R' -> true;
+                 'K', 'L', 'M', 'N', 'O' -> true;
             default -> false;
         };
     }
@@ -306,7 +322,7 @@ public final class MiniTranslator {
      */
     public enum Option {
         /**
-         * Translate color (e.g. &a &1 #123456)
+         * Translate color (e.g. {@code &a} {@code &1} {@code &#123456})
          */
         COLOR,
         /**
@@ -315,10 +331,19 @@ public final class MiniTranslator {
         DOUBLE_HASH_COLOR,
         /**
          * Translate formatting (e.g. &l &r)
+         * Translate formatting (e.g. {@code &l} {@code &o})
          */
         FORMAT,
         /**
-         * Translate custom gradient format (e.g. &@gold-#123456&)
+         * Translate the reset tag {@code &r}
+         */
+        RESET,
+        /**
+         * Use the full MiniMessage color format {@code <color:#123456>} instead of the shortened one {@code <#123456>}
+         */
+        VERBOSE_HEX_COLOR,
+        /**
+         * Translate custom gradient format (e.g. {@code &@gold-#123456&})
          */
         GRADIENT,
         /**
