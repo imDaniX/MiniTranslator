@@ -26,10 +26,10 @@ public class MiniTranslatorTest {
                         "<green><b>Green bold, <reset><red>red normal"
                 }, {
                         "&lBold &athen green",
-                        "<b>Bold </b><green>then green"
+                        "<b>Bold <green>then green"
                 }, {
                         "§lJust bold",
-                        "<b>Just bold</b>"
+                        "<b>Just bold"
                 }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF <red><b>CAPS LOCK<reset><color:#123ABC>?!",

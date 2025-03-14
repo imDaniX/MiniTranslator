@@ -83,7 +83,7 @@ public final class MiniTranslator {
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
         boolean fastReset = options.contains(Option.FAST_RESET);
-        boolean closeLastTag = true;
+        boolean closeLastTag = defCloseValue;
 
         for (
                 int index = 0, nextIndex = text.indexOf('&');
