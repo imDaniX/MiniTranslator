@@ -235,26 +235,18 @@ public final class MiniTranslator {
         return result.toString();
     }
 
-    private static boolean isHexColorStandalone(String text, int index) {
-        if (index > 0 && text.charAt(index - 1) == '&') {
-            return false;
-        }
+private static boolean isHexColorStandalone(String text, int index) {
+    if (index == 0 || index + 7 >= text.length()) return false;
 
+    char prevChar = text.charAt(index - 1);
+    char nextChar = text.charAt(index + 7);
 
-        if (index > 0 && text.charAt(index - 1) == '<') {
-            if (index + 7 < text.length() && text.charAt(index + 7) == '>') {
-                return false;
-            }
-        }
+    if (prevChar == '&') return false; // &#123456
+    if (prevChar == '<' && nextChar == '>') return false; // <#123456>
+    if (prevChar == ':' && (nextChar == '>' || nextChar == ':')) return false; // <color:#123456> | <gradient:#123456:#654321>
 
-        if (index > 0 && text.charAt(index - 1) == ':') {
-            if (index + 7 < text.length() && ">:".indexOf(text.charAt(index + 7)) != -1) {
-                return false;
-            }
-        }
-
-        return index + 7 <= text.length() && HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
-    }
+    return HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
+}
 
     private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
@@ -345,7 +337,6 @@ public final class MiniTranslator {
          */
         HEX_COLOR_STANDALONE,
         /**
-         * Translate formatting (e.g. &l &r)
          * Translate formatting (e.g. {@code &l} {@code &o})
          */
         FORMAT,
@@ -362,7 +353,7 @@ public final class MiniTranslator {
          */
         GRADIENT,
         /**
-         * Place the reset tag when there's 2+ tags to close
+         * Place the reset tag when there are 2+ tags to close
          */
         FAST_RESET,
         /**
