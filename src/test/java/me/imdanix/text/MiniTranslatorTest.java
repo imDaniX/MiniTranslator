@@ -48,9 +48,33 @@ public class MiniTranslatorTest {
         assertEquals(MiniTranslator.toMini(input), expected);
     }
 
+    @DataProvider
+    public Object[][] toMiniStandaloneData() {
+        return new Object[][] {
+                {
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
+                        "Player <#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active"
+                }, {
+                        "<color:#123456>Replace <color:#123456this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? #123456>!!",
+                        "<color:#123456>Replace <color:<color:#123456>this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? <color:#123456>>!!",
+                }
+        };
+    }
+
+    private static final Set<MiniTranslator.Option> STANDALONE = EnumSet.allOf(MiniTranslator.Option.class);
+    static {
+        STANDALONE.remove(MiniTranslator.Option.CLOSE_COLORS);
+    }
+
+    @Test(dataProvider = "toMiniStandaloneData")
+    public void toMiniStandaloneTest(String input, String expected) {
+        assertEquals(MiniTranslator.toMini(input, STANDALONE), expected);
+    }
+
     private static final Set<MiniTranslator.Option> VERBOSE = EnumSet.allOf(MiniTranslator.Option.class);
     static {
         VERBOSE.remove(MiniTranslator.Option.FAST_RESET);
+        VERBOSE.remove(MiniTranslator.Option.HEX_COLOR_STANDALONE);
     }
 
     @DataProvider
