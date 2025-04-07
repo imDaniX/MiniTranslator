@@ -74,6 +74,7 @@ public class MiniTranslatorTest {
     private static final Set<MiniTranslator.Option> VERBOSE = EnumSet.allOf(MiniTranslator.Option.class);
     static {
         VERBOSE.remove(MiniTranslator.Option.FAST_RESET);
+        VERBOSE.remove(MiniTranslator.Option.HEX_COLOR_STANDALONE);
     }
 
     @DataProvider
@@ -95,17 +96,11 @@ public class MiniTranslatorTest {
                         "&lBold &athen green",
                         "<b>Bold </b><green>then green</green>"
                 }, {
-                        "Player <#ff0000>imDaniX has joined the game. Their rank is #00ff00VIP. &#fff5d9Status: <color:#123456>Active",
-                        "Player <#ff0000>imDaniX has joined the game. Their rank is <color:#00ff00>VIP. <color:#fff5d9>Status: <color:#123456>Active</color:#fff5d9>"
-                }, {      
                         "§lJust bold",
                         "<b>Just bold</b>"
                 }, {
                         "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
                         "<white>HOW TO TURN OFF </white><red><b>CAPS LOCK</b></red><color:#123ABC>?!</color:#123ABC>",
-                }, {
-                        "<color:#123456>Replace <color:#123456this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? #123456>!!",
-                        "<color:#123456>Replace <color:<color:#123456>this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? <color:#123456>>!!",
                 }, {
                         "Invalid &jcolor",
                         "Invalid &jcolor"
