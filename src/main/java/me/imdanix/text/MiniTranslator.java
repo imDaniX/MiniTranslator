@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
- * A "translator" from legacy minecraft formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
+ * A "translator" from legacy Minecraft JE formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
  */
 public final class MiniTranslator {
     /**
