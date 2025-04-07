@@ -235,18 +235,18 @@ public final class MiniTranslator {
         return result.toString();
     }
 
-private static boolean isHexColorStandalone(String text, int index) {
-    if (index == 0 || index + 7 >= text.length()) return false;
+    private static boolean isHexColorStandalone(String text, int index) {
+        if (index == 0 || index + 7 >= text.length()) return false;
 
-    char prevChar = text.charAt(index - 1);
-    char nextChar = text.charAt(index + 7);
+        char prevChar = text.charAt(index - 1);
+        char nextChar = text.charAt(index + 7);
 
-    if (prevChar == '&') return false; // &#123456
-    if (prevChar == '<' && nextChar == '>') return false; // <#123456>
-    if (prevChar == ':' && (nextChar == '>' || nextChar == ':')) return false; // <color:#123456> | <gradient:#123456:#654321>
+        if (prevChar == '&') return false; // &#123456
+        if (prevChar == '<' && nextChar == '>') return false; // <#123456>
+        if (prevChar == ':' && (nextChar == '>' || nextChar == ':')) return false; // <color:#123456> | <gradient:#123456:#654321>
 
-    return HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
-}
+        return HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
+    }
 
     private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
