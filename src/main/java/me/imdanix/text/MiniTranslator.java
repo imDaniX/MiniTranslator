@@ -50,7 +50,6 @@ public final class MiniTranslator {
             Option.COLOR, Option.FORMAT, Option.RESET, Option.GRADIENT, Option.FAST_RESET
     ));
 
-    private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
     private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-fA-F])".repeat(6));
 
     private MiniTranslator() {}
@@ -125,17 +124,14 @@ public final class MiniTranslator {
                 case "hex_color" -> {
                     // TODO: This looks too duplicated - there has to be a good way to simplify it
                     if (symbol == '#') {
-                        if (length > index + 6) {
-                            String color = text.substring(index + 1, index + 7);
-                            if (HEX_COLOR.matcher(color).matches()) {
-                                handleClosing(order, builder, closeLastTag, fastReset);
-                                closeLastTag = defCloseValue;
-                                String builtTag = colorTagStart + color;
-                                builder.append('<').append(builtTag).append('>');
-                                index += 6;
-                                order.add(builtTag);
-                                continue;
-                            }
+                        if (length > index + 6 && isHexPattern(text, index + 1)) {
+                            handleClosing(order, builder, closeLastTag, fastReset);
+                            closeLastTag = defCloseValue;
+                            String builtTag = colorTagStart + text.substring(index + 1, index + 7);
+                            builder.append('<').append(builtTag).append('>');
+                            index += 6;
+                            order.add(builtTag);
+                            continue;
                         }
                     } else if (length > index + 12) {
                         String color = text.substring(index + 1, index + 13);
@@ -174,7 +170,7 @@ public final class MiniTranslator {
                             color = colorByChar(color.charAt(0));
                             if (color == null) break;
                         } else if (color.startsWith("#")) {
-                            if (!HEX_COLOR.matcher(color.substring(1)).matches()) {
+                            if (!isHexPattern(color, 1)) {
                                 break;
                             }
                         } else if (NamedTextColor.NAMES.value(color) == null) {
@@ -245,7 +241,7 @@ public final class MiniTranslator {
         if (prevChar == '<' && nextChar == '>') return false; // <#123456>
         if (prevChar == ':' && (nextChar == '>' || nextChar == ':')) return false; // <color:#123456> | <gradient:#123456:#654321>
 
-        return HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
+        return isHexPattern(text, index + 1);
     }
 
     private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
@@ -258,12 +254,12 @@ public final class MiniTranslator {
     }
 
     private static @Nullable String tagByChar(char ch, Collection<Option> options) {
-        if (isColorChar(ch)) {
+        if (isHexDigit(ch)) {
             if (!options.contains(Option.COLOR)) return null;
-            return switch (ch) {
-                case 'x', 'X', '#' -> "hex_color";
-                default -> colorByChar(ch);
-            };
+            return colorByChar(ch);
+        } else if (isHexPrefix(ch)) {
+            if (!options.contains(Option.COLOR)) return null;
+            return "hex_color";
         } else if (isFormatChar(ch)) {
             if (!options.contains(Option.FORMAT)) return null;
             return switch (ch) {
@@ -277,7 +273,8 @@ public final class MiniTranslator {
         } else if (ch == 'r' || ch == 'R') {
             if (!options.contains(Option.RESET)) return null;
             return "reset";
-        } else if (ch == '@' && options.contains(Option.GRADIENT)) {
+        } else if (ch == '@') {
+            if (!options.contains(Option.GRADIENT)) return null;
             return "gradient";
         }
         return null;
@@ -306,12 +303,27 @@ public final class MiniTranslator {
         };
     }
 
-    private static boolean isColorChar(char ch) {
+    private static boolean isHexPattern(String str, int from) {
+        for (int index = from, end = from + 6; index < end; index++) {
+            if (!isHexDigit(str.charAt(index))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isHexDigit(char ch) {
         return switch (ch) {
             case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                  'a', 'b', 'c', 'd', 'e', 'f',
-                 'A', 'B', 'C', 'D', 'E', 'F',
-                 '#', 'x', 'X' -> true;
+                 'A', 'B', 'C', 'D', 'E', 'F' -> true;
+            default -> false;
+        };
+    }
+
+    private static boolean isHexPrefix(char ch) {
+        return switch (ch) {
+            case '#', 'x', 'X' -> true;
             default -> false;
         };
     }
@@ -333,7 +345,7 @@ public final class MiniTranslator {
          */
         COLOR,
         /**
-         * Translate standalone hex colors (e.g. #123456)
+         * Translate standalone hex colors (e.g. {@code #123456})
          */
         HEX_COLOR_STANDALONE,
         /**
