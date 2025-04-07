@@ -28,15 +28,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * A "translator" from legacy minecraft formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
@@ -49,8 +41,6 @@ public final class MiniTranslator {
     public static final Set<Option> DEFAULT_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR, Option.FORMAT, Option.RESET, Option.GRADIENT, Option.FAST_RESET
     ));
-
-    private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-fA-F])".repeat(6));
 
     private MiniTranslator() {}
 
@@ -134,12 +124,11 @@ public final class MiniTranslator {
                             continue;
                         }
                     } else if (length > index + 12) {
-                        String color = text.substring(index + 1, index + 13);
-                        Matcher colorMatcher = LEGACY_HEX_COLOR.matcher(color);
-                        if (colorMatcher.matches()) {
+                        String color = extractLegacyHex(text, index + 1);
+                        if (color != null) {
                             handleClosing(order, builder, closeLastTag, fastReset);
                             closeLastTag = defCloseValue;
-                            String builtTag = colorTagStart + colorMatcher.replaceAll("$1$2$3$4$5$6");
+                            String builtTag = colorTagStart + color;
                             builder.append('<').append(builtTag).append('>');
                             index += 12;
                             order.add(builtTag);
@@ -204,6 +193,19 @@ public final class MiniTranslator {
         }
         if (closeLastTag || !fastReset) {
             handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
+        }
+        return builder.toString();
+    }
+
+    private static @Nullable String extractLegacyHex(String input, int from) {
+        StringBuilder builder = new StringBuilder(6);
+        for (int i = from + 1, end = from + 12; i <= end; i += 2) {
+            char ch = input.charAt(i);
+            if (isHexDigit(ch)) {
+                builder.append(ch);
+            } else {
+                return null;
+            }
         }
         return builder.toString();
     }
@@ -341,7 +343,7 @@ public final class MiniTranslator {
      */
     public enum Option {
         /**
-         * Translate color (e.g. {@code &a} {@code &1} {@code &#123456})
+         * Translate colors (e.g. {@code &a} {@code &1} {@code &#123456})
          */
         COLOR,
         /**
