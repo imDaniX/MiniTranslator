@@ -57,6 +57,9 @@ public class MiniTranslatorTest {
                 }, {
                         "<color:#123456>Replace <color:#123456this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? #123456>!!",
                         "<color:#123456>Replace <color:<color:#123456>this <gradient:#123456:#123456>and :#123456:this, <#123456>ok? <color:#123456>>!!",
+                }, {
+                        "#123456Edges#654321",
+                        "<color:#123456>Edges<color:#654321>"
                 }
         };
     }

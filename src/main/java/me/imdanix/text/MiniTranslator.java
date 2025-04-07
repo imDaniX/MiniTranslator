@@ -234,10 +234,14 @@ public final class MiniTranslator {
     }
 
     private static boolean isHexColorStandalone(String text, int index) {
-        if (index == 0 || index + 7 >= text.length()) return false;
+        if (index + 6 >= text.length()) return false;
 
-        char prevChar = text.charAt(index - 1);
-        char nextChar = text.charAt(index + 7);
+        char prevChar = index == 0
+                ? ' '
+                : text.charAt(index - 1);
+        char nextChar = index + 7 >= text.length()
+                ? ' '
+                : text.charAt(index + 7);
 
         if (prevChar == '&') return false; // &#123456
         if (prevChar == '<' && nextChar == '>') return false; // <#123456>
