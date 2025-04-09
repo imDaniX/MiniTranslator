@@ -71,7 +71,7 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
-        text = text.replace('§', '&');
+        text = text.replace('§', '&').replace("&&", "§");
       
         if (options.contains(Option.HEX_COLOR_STANDALONE)) {
             text = replaceHexColorStandalone(text);
@@ -141,10 +141,14 @@ public final class MiniTranslator {
                     int endIndex = -1;
                     for (int inner = index + 1; inner < length; inner++) {
                         char inCh = Character.toLowerCase(text.charAt(inner));
-                        if (inCh == '&') {
+                        if (inCh == '@') {
                             endIndex = inner;
                             break;
-                        } else if (!(('a' <= inCh && inCh <= 'z') || ('0' <= inCh && inCh <= '9') || inCh == '#' || inCh == '-')) {
+                        } else if (!(
+                                ('a' <= inCh && inCh <= 'z') ||
+                                ('0' <= inCh && inCh <= '9') ||
+                                inCh == '#' || inCh == '-'
+                        )) {
                             break;
                         }
                     }
@@ -194,7 +198,7 @@ public final class MiniTranslator {
         if (closeLastTag || !fastReset) {
             handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
         }
-        return builder.toString();
+        return builder.toString().replace('§', '&');
     }
 
     private static @Nullable String extractLegacyHex(String input, int from) {
@@ -367,7 +371,7 @@ public final class MiniTranslator {
          */
         VERBOSE_HEX_COLOR,
         /**
-         * Translate custom gradient format (e.g. {@code &@gold-#123456&})
+         * Translate custom gradient format (e.g. {@code &@gold-#123456@})
          */
         GRADIENT,
         /**

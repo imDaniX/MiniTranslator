@@ -27,7 +27,7 @@ Here’s how legacy codes map to MiniMessage tags:
 | `&f`               | `<white>`                      |
 | `&x&1&2&3&4&5&6`   | `<color:#123456>`              |
 | `&#123456`         | `<color:#123456>`              |
-| `&@#abcdef-red-a&` | `<gradient:#abcdef:red:green>` |
+| `&@#abcdef-red-a@` | `<gradient:#abcdef:red:green>` |
 | `&r`               | `<reset>`                      |
 | `&l`               | `<b>`                          |
 | `&n`               | `<u>`                          |
