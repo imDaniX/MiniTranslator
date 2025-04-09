@@ -131,6 +131,10 @@ public class MiniTranslatorTest {
     }
 
     private static final String SYMBOLS = "&@-02468#abcdef";
+    private static final Set<MiniTranslator.Option> VERBOSE_STANDALONE = EnumSet.copyOf(VERBOSE);
+    static {
+        VERBOSE_STANDALONE.add(MiniTranslator.Option.HEX_COLOR_STANDALONE);
+    }
 
     @Test(description = "Basically hoping that we'll get no exceptions while parsing a hot stinky mess")
     public void randomTest() {
@@ -141,7 +145,7 @@ public class MiniTranslatorTest {
                 builder.append(SYMBOLS.charAt(rng.nextInt(SYMBOLS.length())));
             }
             try {
-                MiniTranslator.toMini(builder.toString());
+                MiniTranslator.toMini(builder.toString(), VERBOSE_STANDALONE);
             } catch (Throwable throwable) {
                 System.out.println(builder);
                 throw throwable;

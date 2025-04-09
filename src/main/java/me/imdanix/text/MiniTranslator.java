@@ -91,7 +91,7 @@ public final class MiniTranslator {
                 index++, nextIndex = text.indexOf('&', index)
         ) {
             if (nextIndex == -1) {
-                builder.append(text.substring(index));
+                builder.append(text, index, length);
                 break;
             }
 
