@@ -112,7 +112,6 @@ public final class MiniTranslator {
 
             switch (tag) {
                 case "hex_color" -> {
-                    // TODO: This looks too duplicated - there has to be a good way to simplify it
                     if (symbol == '#') {
                         if (length > index + 6 && isHexPattern(text, index + 1)) {
                             handleClosing(order, builder, closeLastTag, fastReset);
@@ -162,10 +161,8 @@ public final class MiniTranslator {
                         if (color.length() == 1) {
                             color = colorByChar(color.charAt(0));
                             if (color == null) break;
-                        } else if (color.startsWith("#")) {
-                            if (!isHexPattern(color, 1)) {
-                                break;
-                            }
+                        } else if (color.startsWith("#") && (color.length() < 7 || !isHexPattern(color, 1))) {
+                            break;
                         } else if (NamedTextColor.NAMES.value(color) == null) {
                             break;
                         }
@@ -205,11 +202,10 @@ public final class MiniTranslator {
         StringBuilder builder = new StringBuilder(6);
         for (int i = from + 1, end = from + 12; i <= end; i += 2) {
             char ch = input.charAt(i);
-            if (isHexDigit(ch)) {
-                builder.append(ch);
-            } else {
+            if (!isHexDigit(ch)) {
                 return null;
             }
+            builder.append(ch);
         }
         return builder.toString();
     }
@@ -273,12 +269,12 @@ public final class MiniTranslator {
         } else if (isFormatChar(ch)) {
             if (!options.contains(Option.FORMAT)) return null;
             return switch (ch) {
-                case 'l', 'L' -> "b";
-                case 'n', 'N' -> "u";
-                case 'm', 'M' -> "st";
-                case 'o', 'O' -> "i";
                 case 'k', 'K' -> "obf";
-                default -> throw new IllegalStateException("Provided impossible symbol '" + ch + "'");
+                case 'l', 'L' -> "b";
+                case 'm', 'M' -> "st";
+                case 'n', 'N' -> "u";
+                case 'o', 'O' -> "i";
+                default -> throw new IllegalStateException("Provided impossible format symbol '" + ch + "'");
             };
         } else if (ch == 'r' || ch == 'R') {
             if (!options.contains(Option.RESET)) return null;
@@ -375,7 +371,7 @@ public final class MiniTranslator {
          */
         GRADIENT,
         /**
-         * Place the reset tag when there are 2+ tags to close
+         * Place the reset tag when there are 2+ tags to close (ignores {@link Option#RESET})
          */
         FAST_RESET,
         /**

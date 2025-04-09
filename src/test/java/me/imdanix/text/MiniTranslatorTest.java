@@ -5,6 +5,8 @@ import org.testng.annotations.Test;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 
 import static org.testng.Assert.assertEquals;
 
@@ -126,5 +128,24 @@ public class MiniTranslatorTest {
     @Test(dataProvider = "toMiniVerboseData")
     public void toMiniVerboseTest(String input, String expected) {
         assertEquals(MiniTranslator.toMini(input, VERBOSE), expected);
+    }
+
+    private static final String SYMBOLS = "&@-02468#abcdef";
+
+    @Test(description = "Basically hoping that we'll get no exceptions while parsing a hot stinky mess")
+    public void randomTest() {
+        RandomGenerator rng = ThreadLocalRandom.current();
+        for (int i = 0; i < 1024; i++) {
+            StringBuilder builder = new StringBuilder(256);
+            for (int j = 0; j < 512; j++) {
+                builder.append(SYMBOLS.charAt(rng.nextInt(SYMBOLS.length())));
+            }
+            try {
+                MiniTranslator.toMini(builder.toString());
+            } catch (Throwable throwable) {
+                System.out.println(builder);
+                throw throwable;
+            }
+        }
     }
 }
