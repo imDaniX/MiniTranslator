@@ -7,7 +7,7 @@ A lightweight utility for converting Minecraft's legacy formatting codes to Mini
 ## **Legacy Codes to MiniMessage Tags**
 Here’s how legacy codes map to MiniMessage tags:
 
-| **Legacy Code**    | **MiniMessage Tag**            |
+| **Legacy Code**    | **Converted**                  |
 |--------------------|--------------------------------|
 | `&0`               | `<black>`                      |
 | `&1`               | `<dark_blue>`                  |
@@ -25,8 +25,8 @@ Here’s how legacy codes map to MiniMessage tags:
 | `&d`               | `<light_purple>`               |
 | `&e`               | `<yellow>`                     |
 | `&f`               | `<white>`                      |
-| `&x&1&2&3&4&5&6`   | `<color:#123456>`              |
-| `&#123456`         | `<color:#123456>`              |
+| `&x&1&2&3&4&5&6`   | `<#123456>`                    |
+| `&#123456`         | `<#123456>`                    |
 | `&@#abcdef-red-a@` | `<gradient:#abcdef:red:green>` |
 | `&r`               | `<reset>`                      |
 | `&l`               | `<b>`                          |
@@ -34,6 +34,7 @@ Here’s how legacy codes map to MiniMessage tags:
 | `&m`               | `<st>`                         |
 | `&o`               | `<i>`                          |
 | `&k`               | `<obf>`                        |
+| `&&e`              | `&e` (escaped)                 |
 
 ## Get It
 Current version: [![latest version](https://jitpack.io/v/imDaniX/MiniTranslator.svg)](https://jitpack.io/#imDaniX/MiniTranslator)
@@ -56,7 +57,7 @@ Current version: [![latest version](https://jitpack.io/v/imDaniX/MiniTranslator.
 <dependency>
     <groupId>com.github.imDaniX</groupId>
     <artifactId>MiniTranslator</artifactId>
-    <version>v2.4.1</version>
+    <version>v2.5.0</version>
 </dependency>
 ```
 
@@ -73,6 +74,6 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'com.github.imDaniX:MiniTranslator:v2.4.1'
+    implementation 'com.github.imDaniX:MiniTranslator:v2.5.0'
 }
 ```
