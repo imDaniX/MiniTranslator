@@ -39,7 +39,7 @@ public final class MiniTranslator {
      * The content might change in the future.
      */
     public static final Set<Option> DEFAULT_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
-            Option.COLOR, Option.FORMAT, Option.RESET, Option.GRADIENT, Option.FAST_RESET
+            Option.COLOR, Option.FORMAT, Option.RESET, Option.GRADIENT, Option.FAST_RESET, Option.DOUBLE_TO_ESCAPE
     ));
 
     private MiniTranslator() {}
@@ -71,7 +71,10 @@ public final class MiniTranslator {
      * @return translated string
      */
     public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
-        text = text.replace('§', '&').replace("&&", "§");
+        text = text.replace('§', '&');
+        if (options.contains(Option.DOUBLE_TO_ESCAPE)) {
+            text = text.replace("&&", "§");
+        }
       
         if (options.contains(Option.HEX_COLOR_STANDALONE)) {
             text = replaceHexColorStandalone(text);
@@ -377,6 +380,10 @@ public final class MiniTranslator {
         /**
          * Close color tags when another color was found
          */
-        CLOSE_COLORS
+        CLOSE_COLORS,
+        /**
+         * Allow EssentialsX-like {@code &&} escaping
+         */
+        DOUBLE_TO_ESCAPE
     }
 }
