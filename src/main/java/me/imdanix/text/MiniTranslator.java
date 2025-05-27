@@ -354,7 +354,7 @@ public final class MiniTranslator {
          */
         COLOR,
         /**
-         * Translate standalone hex colors (e.g. {@code #123456})
+         * Translate standalone hex colors without the special sign {@code &} (e.g. {@code #123456})
          */
         HEX_COLOR_STANDALONE,
         /**

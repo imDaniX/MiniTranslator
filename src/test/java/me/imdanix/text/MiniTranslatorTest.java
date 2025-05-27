@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
+import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand;
 import static org.testng.Assert.assertEquals;
 
 public class MiniTranslatorTest {
@@ -151,5 +153,65 @@ public class MiniTranslatorTest {
                 throw throwable;
             }
         }
+    }
+    @DataProvider
+    public Object[][] performanceData() {
+        return new Object[][] {
+                {
+                        "&aA simple one"
+                }, {
+                        "F&#123456oo &x&6&5&4&3&2&1ba#12345r"
+                }, {
+                        "&c&lServer admin &9imDaniX &8> &#fff5d9&oHello world! YOLO",
+                }, {
+                        "&a&lGreen bold, &cred normal",
+                }, {
+                        "&lBold &athen green",
+                }, {
+                        "&FHOW TO TURN OFF &C&LCAPS LOCK&#123ABC?!",
+                }, {
+                        "Invalid &jcolor",
+                }, {
+                        "&a&lStart from the&r scratch",
+                }
+        };
+    }
+
+    @Test(
+            dataProvider = "performanceData",
+            description = "The \"test\" exists purely for getting a *rough* idea of performance",
+            enabled = false
+    )
+    public void performanceTest(String text) { // TODO Proper JMH
+        int warmup = 100000;
+        int test = 10000;
+
+        var legacyAmpersand = legacyAmpersand();
+        var miniMessage = miniMessage();
+
+        for (int i = 0; i < warmup; i++) {
+            MiniTranslator.toMini(text);
+            miniMessage.serialize(legacyAmpersand.deserialize(text));
+        }
+
+        long start, end;
+
+        start = System.nanoTime();
+        for (int i = 0; i < test; i++) {
+            MiniTranslator.toMini(text);
+        }
+        end = System.nanoTime();
+        System.out.println((end - start) / test);
+
+        start = System.nanoTime();
+        for (int i = 0; i < test; i++) {
+            miniMessage.serialize(legacyAmpersand.deserialize(text));
+        }
+        end = System.nanoTime();
+        System.out.println((end - start) / test);
+
+        System.out.println("Translator: " + MiniTranslator.toMini(text));
+        System.out.println("<reset>");
+        System.out.println("Serializers: " + miniMessage.serialize(legacyAmpersand.deserialize(text)));
     }
 }
