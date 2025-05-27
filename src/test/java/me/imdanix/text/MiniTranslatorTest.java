@@ -30,7 +30,7 @@ public class MiniTranslatorTest {
                         "<green><b>Green bold, <reset><red>red normal"
                 }, {
                         "&lBold &athen green",
-                        "<b>Bold <green>then green"
+                        "<b>Bold </b><green>then green"
                 }, {
                         "§lJust bold",
                         "<b>Just bold"
@@ -154,8 +154,9 @@ public class MiniTranslatorTest {
             }
         }
     }
+
     @DataProvider
-    public Object[][] performanceData() {
+    public Object[][] performanceData() { // No need to update those with the rest
         return new Object[][] {
                 {
                         "&aA simple one"

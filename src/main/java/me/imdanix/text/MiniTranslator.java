@@ -75,18 +75,18 @@ public final class MiniTranslator {
         if (options.contains(Option.DOUBLE_TO_ESCAPE)) {
             text = text.replace("&&", "§");
         }
-      
+
         if (options.contains(Option.HEX_COLOR_STANDALONE)) {
             text = replaceHexColorStandalone(text);
         }
-      
+
         final String colorTagStart = options.contains(Option.VERBOSE_HEX_COLOR) ? "color:#" : "#";
 
-        List<String> order = new ArrayList<>();
+        List<String> order = new ArrayList<>(2);
         StringBuilder builder = new StringBuilder();
-        boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
         boolean fastReset = options.contains(Option.FAST_RESET);
-        boolean closeLastTag = defCloseValue;
+        boolean closeColors = options.contains(Option.CLOSE_COLORS);
+        boolean hadColor = false;
 
         for (
                 int index = 0, nextIndex = text.indexOf('&'), length = text.length();
@@ -117,8 +117,8 @@ public final class MiniTranslator {
                 case "hex_color" -> {
                     if (symbol == '#') {
                         if (length > index + 6 && isHexPattern(text, index + 1)) {
-                            handleClosing(order, builder, closeLastTag, fastReset);
-                            closeLastTag = defCloseValue;
+                            handleClosing(order, builder, hadColor, fastReset, closeColors);
+                            hadColor = true;
                             String builtTag = colorTagStart + text.substring(index + 1, index + 7);
                             builder.append('<').append(builtTag).append('>');
                             index += 6;
@@ -128,8 +128,8 @@ public final class MiniTranslator {
                     } else if (length > index + 12) {
                         String color = extractLegacyHex(text, index + 1);
                         if (color != null) {
-                            handleClosing(order, builder, closeLastTag, fastReset);
-                            closeLastTag = defCloseValue;
+                            handleClosing(order, builder, hadColor, fastReset, closeColors);
+                            hadColor = true;
                             String builtTag = colorTagStart + color;
                             builder.append('<').append(builtTag).append('>');
                             index += 12;
@@ -173,14 +173,15 @@ public final class MiniTranslator {
                     }
                     if (colors.size() == split.length) {
                         index = endIndex;
-                        handleClosing(order, builder, closeLastTag, fastReset);
-                        closeLastTag = true;
+                        handleClosing(order, builder, hadColor, fastReset, closeColors);
+                        hadColor = true;
                         builder.append("<gradient:").append(String.join(":", colors)).append('>');
                         order.add(tag);
                     }
                 }
                 case "reset" -> {
                     order.clear();
+                    hadColor = false;
                     builder.append("<reset>");
                 }
                 case "b", "u", "st", "i", "obf" -> {
@@ -188,15 +189,15 @@ public final class MiniTranslator {
                     builder.append('<').append(tag).append('>');
                 }
                 default -> {
-                    handleClosing(order, builder, closeLastTag, fastReset);
-                    closeLastTag = defCloseValue;
+                    handleClosing(order, builder, hadColor, fastReset, closeColors);
+                    hadColor = true;
                     order.add(tag);
                     builder.append('<').append(tag).append('>');
                 }
             }
         }
-        if (closeLastTag || !fastReset) {
-            handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
+        if (closeColors) {
+            handleClosing(order, builder, hadColor, false, true);
         }
         return builder.toString().replace('§', '&');
     }
@@ -253,10 +254,10 @@ public final class MiniTranslator {
         return isHexPattern(text, index + 1);
     }
 
-    private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
+    private static void handleClosing(List<String> order, StringBuilder builder, boolean hadColor, boolean fastReset, boolean closeColors) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
-        } else for (int i = order.size() - 1, until = closeLast ? 0 : 1; i >= until; i--) {
+        } else for (int i = order.size() - 1, until = (hadColor && !closeColors) ? 1 : 0; i >= until; i--) {
             builder.append("</").append(order.get(i)).append('>');
         }
         order.clear();
