@@ -76,16 +76,17 @@ public final class MiniTranslator {
             text = text.replace("&&", "§");
         }
 
-        if (options.contains(Option.HEX_COLOR_STANDALONE)) {
-            text = replaceHexColorStandalone(text);
-        }
-
         final String colorTagStart = options.contains(Option.VERBOSE_HEX_COLOR) ? "color:#" : "#";
 
-        List<String> order = new ArrayList<>(2);
-        StringBuilder builder = new StringBuilder();
-        boolean fastReset = options.contains(Option.FAST_RESET);
-        boolean closeColors = options.contains(Option.CLOSE_COLORS);
+        if (options.contains(Option.HEX_COLOR_STANDALONE)) {
+            text = replaceHexColorStandalone(text, colorTagStart);
+        }
+
+        final List<String> order = new ArrayList<>(2);
+        final StringBuilder builder = new StringBuilder();
+        final boolean fastReset = options.contains(Option.FAST_RESET);
+        final boolean closeColors = options.contains(Option.CLOSE_COLORS);
+
         boolean hadColor = false;
 
         for (
@@ -214,7 +215,8 @@ public final class MiniTranslator {
         return builder.toString();
     }
 
-    private static String replaceHexColorStandalone(String text) {
+    // TODO Should probably follow the same logic as other colors do? Not sure
+    private static String replaceHexColorStandalone(String text, String colorTagStart) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
@@ -226,7 +228,7 @@ public final class MiniTranslator {
             }
 
             if (isHexColorStandalone(text, nextIndex)) {
-                result.append(text, index, nextIndex).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
+                result.append(text, index, nextIndex).append('<').append(colorTagStart).append(text, nextIndex + 1, nextIndex + 7).append('>');
                 index = nextIndex + 7;
             } else {
                 result.append(text, index, nextIndex + 1);
