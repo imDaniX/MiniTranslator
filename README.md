@@ -57,7 +57,7 @@ Current version: [![latest version](https://jitpack.io/v/imDaniX/MiniTranslator.
 <dependency>
     <groupId>com.github.imDaniX</groupId>
     <artifactId>MiniTranslator</artifactId>
-    <version>v2.6.0</version>
+    <version>v2.6.1</version>
 </dependency>
 ```
 
@@ -74,6 +74,6 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'com.github.imDaniX:MiniTranslator:v2.6.0'
+    implementation 'com.github.imDaniX:MiniTranslator:v2.6.1'
 }
 ```
